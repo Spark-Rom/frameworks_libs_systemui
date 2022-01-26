@@ -231,12 +231,15 @@ public class ThemedIconDrawable extends FastBitmapDrawable {
             float inset = 0.0f;
             if (mDrawable != null) {
                 d = mDrawable.mutate();
-            } else {
-               inset = .2f;
-               d = mResources.getDrawable(mResID).mutate();
+                d.setTint(accentColor);
+                Drawable bg = new ColorDrawable(getColors(mResources)[0]);
+                Drawable fg = new InsetDrawable(d, 0f);
+                return new AdaptiveIconDrawable(bg, fg);
             }
+
+            d = mResources.getDrawable(mResID).mutate();
             d.setTint(accentColor);
-            d = new InsetDrawable(d, inset);
+            d = new InsetDrawable(d, .2f);
             return d;
         }
 
@@ -295,9 +298,6 @@ public class ThemedIconDrawable extends FastBitmapDrawable {
             int[] colors = getColors(context);
             Drawable bg = new ColorDrawable(colors[0]);
             float inset = getExtraInsetFraction() / (1 + 2 * getExtraInsetFraction());
-            if  (mThemeData.mDrawable != null) {
-                inset = 0.0f;
-            }
             Drawable fg = new InsetDrawable(mThemeData.loadMonochromeDrawable(colors[1]), inset);
             return new AdaptiveIconDrawable(bg, fg);
         }
@@ -306,8 +306,7 @@ public class ThemedIconDrawable extends FastBitmapDrawable {
     /**
      * Get an int array representing background and foreground colors for themed icons
      */
-    public static int[] getColors(Context context) {
-        Resources res = context.getResources();
+    public static int[] getColors(Resources res) {
         int[] colors = new int[2];
         if ((res.getConfiguration().uiMode & UI_MODE_NIGHT_MASK) == UI_MODE_NIGHT_YES) {
             colors[0] = res.getColor(android.R.color.system_neutral1_800);
@@ -318,4 +317,9 @@ public class ThemedIconDrawable extends FastBitmapDrawable {
         }
         return colors;
     }
+
+    public static int[] getColors(Context context) {
+        return getColors(context.getResources());
+    }
+
 }
